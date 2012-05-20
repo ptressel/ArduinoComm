@@ -22,26 +22,29 @@ public class ArduinoCommActivity extends Activity {
         Log.d(TAG, "In onResume");
         
         // @ToDo: Move this to a Service.
+        
+        ArduinoComm comm = null;
         try {
-            ArduinoIn in = new ArduinoIn(ArduinoIn.IN_QUEUE_MAX);
-            Log.d(TAG, "ArduinoIn create succeeded");
-            Thread inThread = new Thread(null, in, ArduinoIn.TAG);
-            Log.d(TAG, "About to start input worker thread");
-            inThread.start();
+            comm = new ArduinoComm();
         } catch (IOException e) {
-            Log.e(TAG, "Could not set up input worker");
+            Log.e(TAG, "Could not set up communication with the Arduino", e);
         }
         
-        /*
-        try {
-            ArduinoOut out = new ArduinoOut(ArduinoOut.OUT_QUEUE_MAX);
-            Log.d(TAG, "ArduinoOut create succeeded");
-            Thread outThread = new Thread(null, out, ArduinoOut.TAG);
-            Log.d(TAG, "About to start output worker thread");
-            outThread.start();
-        } catch (IOException e) {
-            Log.e(TAG, "Could not set up output worker");
-        }
+        ArduinoIn in = new ArduinoIn(comm);
+        // @Debug: For testing with MockInputStream, comment out the above
+        // lines for ArduinoComm and ArduinoIn, and uncomment the following.
+        // ArduinoIn in = new ArduinoIn();
+        Log.d(TAG, "ArduinoIn create succeeded");
+        Thread inThread = new Thread(null, in, ArduinoIn.TAG);
+        Log.d(TAG, "About to start input worker thread");
+        inThread.start();
+        
+        /* @Debug:
+        ArduinoOut out = new ArduinoOut(comm);
+        Log.d(TAG, "ArduinoOut create succeeded");
+        Thread outThread = new Thread(null, out, ArduinoOut.TAG);
+        Log.d(TAG, "About to start output worker thread");
+        outThread.start();
         */
     }
     
@@ -49,6 +52,7 @@ public class ArduinoCommActivity extends Activity {
     public void onPause() {
         super.onPause();
         Log.d(TAG, "In onPause");
-        // @ToDo: Should we close the socket?
+        // @ToDo: onPause is moot when this moves to a service, but in
+        // generalShould we close the socket if we're exiting?
     }
 }
