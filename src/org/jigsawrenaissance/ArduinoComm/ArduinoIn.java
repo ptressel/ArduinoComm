@@ -6,6 +6,27 @@ import java.io.IOException;
 import android.os.SystemClock;
 import android.util.Log;
 
+/**
+ * Read from the Arduino over USB using ADB as the transmission protocol.
+ * Parse sensor messages, put their contents in ArduinoMessage objects, and
+ * queue them up for the control module.
+ * 
+ * Format of the messages is based on NMEA:
+ * http://www.gpsinformation.org/dale/nmea.htm
+ * http://aprs.gids.nl/nmea/
+ * 
+ * @ToDo: The incoming messages have checksums, but there is an uncertainty
+ * in their definition. The checksum calculator here:
+ * http://www.hhhh.org/wiml/proj/nmeaxor.html
+ * does not seem to include spaces in the count. The reason this is important
+ * is that we don't construct the messages from the external GPS, and the
+ * description of NMEA GGA message here:
+ * http://aprs.gids.nl/nmea/#gga
+ * shows blanks in the example of message data. If the GPS will be computing
+ * its own checksum, then we need to abide by whatever its computation is.
+ * 
+ * @author Pat Tressel
+ */
 public class ArduinoIn implements Runnable {
     public static final String TAG = "ArduinoIn";
     
@@ -43,6 +64,7 @@ public class ArduinoIn implements Runnable {
             "$PRSO303,254*31\r\n".getBytes(),
             "$PRSO400,1*37\r\n".getBytes(),
             "$PRSO401,0*37\r\n".getBytes(),
+            "$GPGGA,170834,4124.8963,N,08151.6838, W,1,05,1.5,280.2,M,-34.0, M,,*75".getBytes(),
         };
         
         // These point to the next byte to return.
@@ -80,6 +102,11 @@ public class ArduinoIn implements Runnable {
         sensorQueue = new PoolQueue(Constants.IN_QUEUE_MAX);
     }
     */
+    
+    /** Provide our queue for the control module. */
+    public PoolQueue getQueue() {
+        return sensorQueue;
+    }
     
     private int readInput() {
         int b = 0;
