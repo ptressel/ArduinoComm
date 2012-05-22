@@ -34,14 +34,15 @@ public class ArduinoIn implements Runnable {
      * must comment out the use of ArduinoComm and substitute this. It provides
      * only the one InputStream method that is used here -- read().
      */
+    /*
     public class MockInputStream {
         public final byte[][] messages = {
-            "$PRSO100,1".getBytes(),
-            "$PRSO200,10,20,30,40,50".getBytes(),
-            "$PRSO201,11,21,31,41,51*1".getBytes(),
-            "$PRSO303,254*31".getBytes(),
-            "$PRSO400,1*37".getBytes(),
-            "$PRSO401,0*37".getBytes(),
+            "$PRSO100,1\r\n".getBytes(),
+            "$PRSO200,10,20,30,40,50\r\n".getBytes(),
+            "$PRSO201,11,21,31,41,51*1\r\n".getBytes(),
+            "$PRSO303,254*31\r\n".getBytes(),
+            "$PRSO400,1*37\r\n".getBytes(),
+            "$PRSO401,0*37\r\n".getBytes(),
         };
         
         // These point to the next byte to return.
@@ -55,10 +56,13 @@ public class ArduinoIn implements Runnable {
                 // End of that message.
                 j = 0;
                 i = (i + 1) % messages.length;
+            } else {
+                ++j;
             }
             return b;
         }
     }
+    */
     
     /** This is the real constructor. */
     public ArduinoIn(ArduinoComm comm) {
@@ -79,6 +83,7 @@ public class ArduinoIn implements Runnable {
     
     private int readInput() {
         int b = 0;
+        // @Debug: Comment out the try catch.
         try {
             Log.d(TAG, "About to call read()");
             b = input.read();
@@ -166,6 +171,8 @@ public class ArduinoIn implements Runnable {
                         m.obj = new String(text);
                         Log.d(TAG, "End of message, sending.");
                         sensorQueue.send(m);
+                        // Don't hold a reference to the message.
+                        m = null;
                         msgDone = true;
                     } else {
                         // CR in the middle of a message -- probably a mistake.

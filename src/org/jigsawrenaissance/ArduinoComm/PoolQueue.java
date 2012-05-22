@@ -55,6 +55,7 @@ public class PoolQueue {
                 try {
                     Log.d(TAG, "At max count of messages, waiting for a return.");
                     message = pool.take();
+                    break;
                 } catch (InterruptedException e) { }
             }
             Log.d(TAG, "Have an available message.");
@@ -68,6 +69,7 @@ public class PoolQueue {
         while (true) {
             try {
                 pool.put(empty);
+                break;
             } catch (InterruptedException e) { }
         }
     }
@@ -109,6 +111,7 @@ public class PoolQueue {
         while (true) {
             try {
                 queue.putLast(m);
+                break;
             } catch (InterruptedException e) { }
         }
     }

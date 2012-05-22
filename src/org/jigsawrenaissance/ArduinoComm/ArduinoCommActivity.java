@@ -23,6 +23,7 @@ public class ArduinoCommActivity extends Activity {
         
         // @ToDo: Move this to a Service.
         
+        // @Debug: Comment out ArduinoComm.
         ArduinoComm comm = null;
         try {
             comm = new ArduinoComm();
@@ -30,22 +31,21 @@ public class ArduinoCommActivity extends Activity {
             Log.e(TAG, "Could not set up communication with the Arduino", e);
         }
         
+        // @Debug: For testing with MockInputStream, comment out the first
+        // line ArduinoIn(comm), and uncomment the following with ArduinoIn().
         ArduinoIn in = new ArduinoIn(comm);
-        // @Debug: For testing with MockInputStream, comment out the above
-        // lines for ArduinoComm and ArduinoIn, and uncomment the following.
-        // ArduinoIn in = new ArduinoIn();
+        //ArduinoIn in = new ArduinoIn();
         Log.d(TAG, "ArduinoIn create succeeded");
         Thread inThread = new Thread(null, in, ArduinoIn.TAG);
         Log.d(TAG, "About to start input worker thread");
         inThread.start();
         
-        /* @Debug:
+        // @Debug: Comment out starting ArduinoOut.
         ArduinoOut out = new ArduinoOut(comm);
         Log.d(TAG, "ArduinoOut create succeeded");
         Thread outThread = new Thread(null, out, ArduinoOut.TAG);
         Log.d(TAG, "About to start output worker thread");
         outThread.start();
-        */
     }
     
     @Override
@@ -53,6 +53,6 @@ public class ArduinoCommActivity extends Activity {
         super.onPause();
         Log.d(TAG, "In onPause");
         // @ToDo: onPause is moot when this moves to a service, but in
-        // generalShould we close the socket if we're exiting?
+        // general, should we close the socket if we're exiting?
     }
 }
